@@ -9,16 +9,16 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"yandex_gophermart/internal/loaylty_system"
+	loayltysystem "yandex_gophermart/internal/loaylty_system"
 )
 
 type Runner struct {
 	log                 *zap.SugaredLogger
 	server              *http.Server
-	loyaltyPointsSystem *loaylty_system.LoyaltySystem
+	loyaltyPointsSystem *loayltysystem.LoyaltySystem
 }
 
-func NewRun(server *http.Server, loyaltyPointsSystem *loaylty_system.LoyaltySystem, log *zap.SugaredLogger) *Runner {
+func NewRun(server *http.Server, loyaltyPointsSystem *loayltysystem.LoyaltySystem, log *zap.SugaredLogger) *Runner {
 	return &Runner{
 		server:              server,
 		log:                 log,

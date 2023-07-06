@@ -1,4 +1,4 @@
-package loayltySystem
+package loayltysystem
 
 import (
 	"encoding/json"
