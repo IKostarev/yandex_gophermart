@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	loayltysystem "yandex_gophermart/internal/loaylty_system"
+	"yandex_gophermart/internal/loayltysystem"
 )
 
 type Runner struct {

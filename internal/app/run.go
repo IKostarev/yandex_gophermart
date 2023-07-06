@@ -7,7 +7,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"os"
 	"yandex_gophermart/internal/config"
-	"yandex_gophermart/internal/loaylty_system"
+	"yandex_gophermart/internal/loayltysystem"
 	"yandex_gophermart/internal/runner"
 	"yandex_gophermart/internal/server"
 	storage "yandex_gophermart/internal/storage/db"
@@ -47,7 +47,7 @@ func Run() {
 
 	appServer := server.NewServer(cfg.Server.Address, NewApp(dbManager, log.Sugar()))
 
-	loyaltyPointsSystem := loaylty_system.NewLSystem(cfg.AccrualSystem.Address, dbManager, log.Sugar())
+	loyaltyPointsSystem := loayltysystem.NewLSystem(cfg.AccrualSystem.Address, dbManager, log.Sugar())
 
 	run := runner.NewRun(appServer, loyaltyPointsSystem, log.Sugar())
 	if err = run.Run(ctx); err != nil {
