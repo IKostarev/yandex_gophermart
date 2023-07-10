@@ -172,13 +172,9 @@ func (m *Manager) GetUserOrders(login string) ([]byte, error) {
 }
 
 func (m *Manager) GetAllOrders() ([]string, error) {
-	//getAllOrders := `SELECT order_id FROM orders WHERE status != $1` //`SELECT order_id FROM orders`
-	//
-	//rows, err := m.db.Query(getAllOrders, "PROCESSED")
+	getAllOrders := `SELECT order_id FROM orders WHERE status != $1`
 
-	getAllOrders := `SELECT order_id FROM orders`
-
-	rows, err := m.db.Query(getAllOrders)
+	rows, err := m.db.Query(getAllOrders, "PROCESSED")
 
 	if err != nil {
 		return nil, fmt.Errorf("error while getting all orders from db: %w", err)
@@ -271,13 +267,9 @@ func (m *Manager) Register(login string, password string) error {
 }
 
 func (m *Manager) Login(login string, password string) error {
-	//getRegisteredUser := `SELECT login, password FROM registered_users WHERE login = $1`
-	//
-	//rows, err := m.db.Query(getRegisteredUser, login)
+	getRegisteredUser := `SELECT login, password FROM registered_users WHERE login = $1`
 
-	getRegisteredUser := `SELECT login, password FROM registered_users`
-
-	rows, err := m.db.Query(getRegisteredUser)
+	rows, err := m.db.Query(getRegisteredUser, login)
 	if err != nil {
 		return fmt.Errorf("error while executing search query: %w", err)
 	}

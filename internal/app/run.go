@@ -24,6 +24,7 @@ func Run() {
 
 	cfg := config.NewConfig()
 
+	// когда переносил в NewPostgres не завелось, вернул обратно
 	db, err := sql.Open("pgx", cfg.Database.ConnectionString)
 	if err != nil {
 		log.Sugar().Fatalf("error while init db: %s", err.Error())
