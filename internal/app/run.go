@@ -23,23 +23,10 @@ func Run() {
 
 	cfg := config.NewConfig()
 
-	//db, err := sql.Open("pgx", cfg.Database.ConnectionString)
-	//if err != nil {
-	//	log.Sugar().Fatalf("error while init db: %s", err.Error())
-	//}
-	//defer func() {
-	//	if err := db.Close(); err != nil {
-	//		log.Sugar().Fatalf("error while closing db: %s", err.Error())
-	//	}
-	//}()
-
 	dbManager, err := storage.NewPostgres(ctx, cfg, log.Sugar())
 	if err != nil {
 		log.Sugar().Fatalf("error while init db: %s", err.Error())
 	}
-	//defer func() {
-	//	dbManager.Close()
-	//}()
 
 	appServer := server.NewServer(cfg.Server.Address, NewApp(dbManager, log.Sugar()))
 

@@ -42,23 +42,26 @@ func (h *Handler) extractJwtToken(r *http.Request) (*jwt.Token, error) {
 	return tkn, err
 }
 
-func (h *Handler) parseInputUser(r *http.Request) (*models.User, error) {
+func (h *Handler) parseInputUser(r *http.Request) (*models.User, bool) {
 	var userFromRequest *models.User
 	var buf bytes.Buffer
 
 	if _, err := buf.ReadFrom(r.Body); err != nil {
-		return nil, fmt.Errorf("error while reading request body: %s", err)
+		h.log.Errorf("error while reading request body: %s", err.Error())
+		return nil, false
 	}
 
 	if err := json.Unmarshal(buf.Bytes(), &userFromRequest); err != nil {
-		return nil, fmt.Errorf("error while unmarshalling request body: %s", err)
+		h.log.Errorf("error while unmarshalling request body: %s", err.Error())
+		return nil, false
 	}
 
 	if userFromRequest.Login == "" || userFromRequest.Password == "" {
-		return nil, fmt.Errorf("login or password is empty")
+		h.log.Errorf("login or password is empty")
+		return nil, false
 	}
 
-	return userFromRequest, nil
+	return userFromRequest, true
 }
 
 func (h *Handler) getUsernameFromToken(r *http.Request) (string, int) {
