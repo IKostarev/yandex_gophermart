@@ -273,9 +273,13 @@ func (m *Manager) Register(login string, password string) error {
 }
 
 func (m *Manager) Login(login string, password string) error {
-	getRegisteredUser := `SELECT login, password FROM registered_users WHERE login = $1`
+	//getRegisteredUser := `SELECT login, password FROM registered_users WHERE login = $1`
+	//
+	//rows, err := m.db.Query(getRegisteredUser, login)
 
-	rows, err := m.db.Query(getRegisteredUser, login)
+	getRegisteredUser := `SELECT login, password FROM registered_users`
+
+	rows, err := m.db.Query(getRegisteredUser)
 	if err != nil {
 		return fmt.Errorf("error while executing search query: %w", err)
 	}
