@@ -174,9 +174,13 @@ func (m *Manager) GetUserOrders(login string) ([]byte, error) {
 }
 
 func (m *Manager) GetAllOrders() ([]string, error) {
-	getAllOrders := `SELECT order_id FROM orders WHERE status != $1` //`SELECT order_id FROM orders`
+	//getAllOrders := `SELECT order_id FROM orders WHERE status != $1` //`SELECT order_id FROM orders`
+	//
+	//rows, err := m.db.Query(getAllOrders, "PROCESSED")
 
-	rows, err := m.db.Query(getAllOrders, "PROCESSED")
+	getAllOrders := `SELECT order_id FROM orders`
+
+	rows, err := m.db.Query(getAllOrders)
 
 	if err != nil {
 		return nil, fmt.Errorf("error while getting all orders from db: %w", err)
