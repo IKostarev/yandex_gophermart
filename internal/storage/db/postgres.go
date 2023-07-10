@@ -284,17 +284,17 @@ func (m *Manager) Login(login string, password string) error {
 		return fmt.Errorf("error while executing search query: %w", err)
 	}
 
-	//defer func() {
-	//	err = rows.Close()
-	//	if err != nil {
-	//		_ = fmt.Errorf("error rows close is: %s", err)
-	//	}
-	//
-	//	err = rows.Err()
-	//	if err != nil {
-	//		_ = fmt.Errorf("error rows Err is: %s", err)
-	//	}
-	//}()
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			_ = fmt.Errorf("error rows close is: %s", err)
+		}
+
+		err = rows.Err()
+		if err != nil {
+			_ = fmt.Errorf("error rows Err is: %s", err)
+		}
+	}()
 
 	for rows.Next() {
 		var loginFromDB, passwordFromDB string
@@ -352,7 +352,7 @@ func (m *Manager) init(ctx context.Context) error {
 	return nil
 }
 
-func NewPostgres(ctx context.Context, cfg *config.Config, log *zap.SugaredLogger) (*Manager, error) {
+func NewPostgres(ctx context.Context, cfg config.Config, log *zap.SugaredLogger) (*Manager, error) {
 	db, err := sql.Open("pgx", cfg.Database.ConnectionString)
 	if err != nil {
 		log.Fatalf("error while init db: %s", err.Error())

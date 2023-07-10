@@ -23,7 +23,7 @@ func Run() {
 
 	cfg := config.NewConfig()
 
-	dbManager, err := storage.NewPostgres(ctx, cfg, log.Sugar())
+	dbManager, err := storage.NewPostgres(ctx, *cfg, log.Sugar())
 	if err != nil {
 		log.Sugar().Fatalf("error while init db: %s", err.Error())
 	}
