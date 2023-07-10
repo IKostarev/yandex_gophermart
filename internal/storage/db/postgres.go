@@ -6,10 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"time"
-	"yandex_gophermart/internal/config"
 	"yandex_gophermart/internal/models"
 )
 
@@ -352,16 +350,7 @@ func (m *Manager) init(ctx context.Context) error {
 	return nil
 }
 
-func NewPostgres(ctx context.Context, cfg config.Config, log *zap.SugaredLogger) (*Manager, error) {
-	db, err := sql.Open("pgx", cfg.Database.ConnectionString)
-	if err != nil {
-		log.Fatalf("error while init db: %s", err.Error())
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("error while closing db: %s", err.Error())
-		}
-	}()
+func NewPostgres(ctx context.Context, db *sql.DB) (*Manager, error) {
 
 	m := Manager{
 		db: db,

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"yandex_gophermart/internal/config"
 	"yandex_gophermart/internal/loayltysystem"
@@ -23,7 +24,17 @@ func Run() {
 
 	cfg := config.NewConfig()
 
-	dbManager, err := storage.NewPostgres(ctx, *cfg, log.Sugar())
+	db, err := sql.Open("pgx", cfg.Database.ConnectionString)
+	if err != nil {
+		log.Sugar().Fatalf("error while init db: %s", err.Error())
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Sugar().Fatalf("error while closing db: %s", err.Error())
+		}
+	}()
+
+	dbManager, err := storage.NewPostgres(ctx, db)
 	if err != nil {
 		log.Sugar().Fatalf("error while init db: %s", err.Error())
 	}
