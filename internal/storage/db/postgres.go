@@ -284,17 +284,17 @@ func (m *Manager) Login(login string, password string) error {
 		return fmt.Errorf("error while executing search query: %w", err)
 	}
 
-	defer func() {
-		err = rows.Close()
-		if err != nil {
-			_ = fmt.Errorf("error rows close is: %s", err)
-		}
-
-		err = rows.Err()
-		if err != nil {
-			_ = fmt.Errorf("error rows Err is: %s", err)
-		}
-	}()
+	//defer func() {
+	//	err = rows.Close()
+	//	if err != nil {
+	//		_ = fmt.Errorf("error rows close is: %s", err)
+	//	}
+	//
+	//	err = rows.Err()
+	//	if err != nil {
+	//		_ = fmt.Errorf("error rows Err is: %s", err)
+	//	}
+	//}()
 
 	for rows.Next() {
 		var loginFromDB, passwordFromDB string
