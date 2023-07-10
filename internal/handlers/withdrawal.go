@@ -29,5 +29,8 @@ func (h *Handler) GetWithdrawalsHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, _ = w.Write(userWithdrawals)
+	_, err = w.Write(userWithdrawals)
+	if err != nil {
+		h.log.Errorf("error write user withdrawals is: %s", err)
+	}
 }

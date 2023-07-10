@@ -2,10 +2,7 @@ package app
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"os"
 	"yandex_gophermart/internal/config"
 	"yandex_gophermart/internal/loayltysystem"
 	"yandex_gophermart/internal/runner"
@@ -21,29 +18,28 @@ func Run() {
 
 	log, err := logger.New(logLevel)
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		log.Sugar().Fatalf("error init log level: %s", err.Error())
 	}
 
 	cfg := config.NewConfig()
 
-	db, err := sql.Open("pgx", cfg.Database.ConnectionString)
-	if err != nil {
-		log.Sugar().Errorf("error while init db: %s", err.Error())
-		os.Exit(1)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Sugar().Errorf("error while closing db: %s", err.Error())
-			os.Exit(1)
-		}
-	}()
+	//db, err := sql.Open("pgx", cfg.Database.ConnectionString)
+	//if err != nil {
+	//	log.Sugar().Fatalf("error while init db: %s", err.Error())
+	//}
+	//defer func() {
+	//	if err := db.Close(); err != nil {
+	//		log.Sugar().Fatalf("error while closing db: %s", err.Error())
+	//	}
+	//}()
 
-	dbManager, err := storage.NewPostgres(ctx, db)
+	dbManager, err := storage.NewPostgres(ctx, cfg, log.Sugar())
 	if err != nil {
-		log.Sugar().Errorf("error while init db: %s", err.Error())
-		os.Exit(1)
+		log.Sugar().Fatalf("error while init db: %s", err.Error())
 	}
+	//defer func() {
+	//	dbManager.Close()
+	//}()
 
 	appServer := server.NewServer(cfg.Server.Address, NewApp(dbManager, log.Sugar()))
 
@@ -51,7 +47,7 @@ func Run() {
 
 	run := runner.NewRun(appServer, loyaltyPointsSystem, log.Sugar())
 	if err = run.Run(ctx); err != nil {
-		log.Sugar().Errorf("error while running runner: %s", err.Error())
+		log.Sugar().Fatalf("error while running runner: %s", err.Error())
 		return
 	}
 }

@@ -1,6 +1,9 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"fmt"
+	"go.uber.org/zap"
+)
 
 func New(level string) (*zap.Logger, error) {
 	lvl, err := zap.ParseAtomicLevel(level)
@@ -14,7 +17,7 @@ func New(level string) (*zap.Logger, error) {
 
 	zapLogger, err := cfg.Build()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error config build is: %s", err)
 	}
 
 	return zapLogger, nil

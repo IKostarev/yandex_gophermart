@@ -32,7 +32,10 @@ func (h *Handler) GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = w.Write(userOrders)
+	_, err = w.Write(userOrders)
+	if err != nil {
+		h.log.Errorf("error write user balance is: %s", err)
+	}
 }
 
 func (h *Handler) LoadOrderHandler(w http.ResponseWriter, r *http.Request) {

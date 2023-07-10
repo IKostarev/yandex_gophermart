@@ -18,5 +18,8 @@ func (h *Handler) GetBalanceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = w.Write(userBalance)
+	_, err = w.Write(userBalance)
+	if err != nil {
+		h.log.Errorf("error write user balance is: %s", err)
+	}
 }

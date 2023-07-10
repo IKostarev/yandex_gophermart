@@ -6,8 +6,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"time"
+	"yandex_gophermart/internal/config"
 	"yandex_gophermart/internal/models"
 )
 
@@ -57,8 +59,15 @@ func (m *Manager) GetWithdrawals(login string) ([]byte, error) {
 	}
 
 	defer func() {
-		_ = rows.Close()
-		_ = rows.Err()
+		err = rows.Close()
+		if err != nil {
+			_ = fmt.Errorf("error rows close is: %s", err)
+		}
+
+		err = rows.Err()
+		if err != nil {
+			_ = fmt.Errorf("error rows Err is: %s", err)
+		}
 	}()
 
 	userWithdrawals := make([]models.WithdrawInfo, 0)
@@ -119,8 +128,15 @@ func (m *Manager) GetUserOrders(login string) ([]byte, error) {
 	}
 
 	defer func() {
-		_ = rows.Close()
-		_ = rows.Err()
+		err = rows.Close()
+		if err != nil {
+			_ = fmt.Errorf("error rows close is: %s", err)
+		}
+
+		err = rows.Err()
+		if err != nil {
+			_ = fmt.Errorf("error rows Err is: %s", err)
+		}
 	}()
 
 	userOrders := make([]models.OrderInfo, 0)
@@ -158,17 +174,24 @@ func (m *Manager) GetUserOrders(login string) ([]byte, error) {
 }
 
 func (m *Manager) GetAllOrders() ([]string, error) {
-	getAllOrders := `SELECT order_id FROM orders`
+	getAllOrders := `SELECT order_id FROM orders WHERE status != $1` //`SELECT order_id FROM orders`
 
-	rows, err := m.db.Query(getAllOrders)
+	rows, err := m.db.Query(getAllOrders, "PROCESSED")
 
 	if err != nil {
 		return nil, fmt.Errorf("error while getting all orders from db: %w", err)
 	}
 
 	defer func() {
-		_ = rows.Close()
-		_ = rows.Err()
+		err = rows.Close()
+		if err != nil {
+			_ = fmt.Errorf("error rows close is: %s", err)
+		}
+
+		err = rows.Err()
+		if err != nil {
+			_ = fmt.Errorf("error rows Err is: %s", err)
+		}
 	}()
 
 	orders := make([]string, 0)
@@ -246,16 +269,23 @@ func (m *Manager) Register(login string, password string) error {
 }
 
 func (m *Manager) Login(login string, password string) error {
-	getRegisteredUser := `SELECT login, password FROM registered_users`
+	getRegisteredUser := `SELECT login, password FROM registered_users WHERE login = $1`
 
-	rows, err := m.db.Query(getRegisteredUser)
+	rows, err := m.db.Query(getRegisteredUser, login)
 	if err != nil {
 		return fmt.Errorf("error while executing search query: %w", err)
 	}
 
 	defer func() {
-		_ = rows.Close()
-		_ = rows.Err()
+		err = rows.Close()
+		if err != nil {
+			_ = fmt.Errorf("error rows close is: %s", err)
+		}
+
+		err = rows.Err()
+		if err != nil {
+			_ = fmt.Errorf("error rows Err is: %s", err)
+		}
 	}()
 
 	for rows.Next() {
@@ -314,7 +344,17 @@ func (m *Manager) init(ctx context.Context) error {
 	return nil
 }
 
-func NewPostgres(ctx context.Context, db *sql.DB) (*Manager, error) {
+func NewPostgres(ctx context.Context, cfg *config.Config, log *zap.SugaredLogger) (*Manager, error) {
+	db, err := sql.Open("pgx", cfg.Database.ConnectionString)
+	if err != nil {
+		log.Fatalf("error while init db: %s", err.Error())
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Fatalf("error while closing db: %s", err.Error())
+		}
+	}()
+
 	m := Manager{
 		db: db,
 	}

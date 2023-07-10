@@ -9,13 +9,14 @@ import (
 func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	user, success := h.parseInputUser(r)
-	if !success {
+	user, err := h.parseInputUser(r)
+	if err != nil {
+		h.log.Errorf("parse input user is error: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if err := h.db.Login(user.Login, user.Password); err != nil {
+	if err = h.db.Login(user.Login, user.Password); err != nil {
 		h.log.Errorf("error while login user: %s", err.Error())
 		w.WriteHeader(http.StatusUnauthorized)
 		return

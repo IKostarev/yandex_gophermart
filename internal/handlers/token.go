@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 	"strings"
@@ -35,32 +36,29 @@ func (h *Handler) extractJwtToken(r *http.Request) (*jwt.Token, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parse with claims is: %s", err)
 	}
 
 	return tkn, err
 }
 
-func (h *Handler) parseInputUser(r *http.Request) (*models.User, bool) {
+func (h *Handler) parseInputUser(r *http.Request) (*models.User, error) {
 	var userFromRequest *models.User
 	var buf bytes.Buffer
 
 	if _, err := buf.ReadFrom(r.Body); err != nil {
-		h.log.Errorf("error while reading request body: %s", err.Error())
-		return nil, false
+		return nil, fmt.Errorf("error while reading request body: %s", err)
 	}
 
 	if err := json.Unmarshal(buf.Bytes(), &userFromRequest); err != nil {
-		h.log.Errorf("error while unmarshalling request body: %s", err.Error())
-		return nil, false
+		return nil, fmt.Errorf("error while unmarshalling request body: %s", err)
 	}
 
 	if userFromRequest.Login == "" || userFromRequest.Password == "" {
-		h.log.Errorf("login or password is empty")
-		return nil, false
+		return nil, fmt.Errorf("login or password is empty")
 	}
 
-	return userFromRequest, true
+	return userFromRequest, nil
 }
 
 func (h *Handler) getUsernameFromToken(r *http.Request) (string, int) {
@@ -98,7 +96,7 @@ func createToken(userName string, expirationTime time.Time) (string, error) {
 
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error signed string jwt token is: %s", err)
 	}
 
 	return tokenString, nil
